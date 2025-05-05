@@ -8,10 +8,6 @@ import (
 	"strings"
 )
 
-// Ensures gofmt doesn't remove the "net" and "os" imports above (feel free to remove this!)
-var _ = net.Listen
-var _ = os.Exit
-
 func main() {
 	// You can use print statements as follows for debugging, they'll be visible when running tests.
 	fmt.Println("Logs from your program will appear here!")
@@ -69,16 +65,19 @@ func (s *Server) handleConnection(conn net.Conn) {
 		return
 	}
 	parts := strings.Split(line, " ")
+	path := parts[1]
 	if len(parts) < 2 {
 		conn.Write([]byte("HTTP/1.1 400 Bad Request\r\n\r\n"))
 		conn.Close()
 		return
 	}
-	if parts[1] == "/" {
-		conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
-	} else {
-
+	switch path {
+	case "/":
+		fmt.Println(parts)
+		conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\nWelcome!\n"))
+	case "/hello":
+		conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\nHello, World!\n"))
+	default:
 		conn.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
 	}
-
 }
